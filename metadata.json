@@ -1,0 +1,5 @@
+{
+  "name": "Tesla RAG Visualizer",
+  "description": "An interactive educational tool demonstrating Retrieval-Augmented Generation (RAG) concepts using a Tesla Model X manual corpus. Features real-time chunking visualization, embedding similarity analysis, and Pre-RAG vs. RAG comparison.",
+  "requestFramePermissions": []
+}
