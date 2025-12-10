@@ -21,7 +21,7 @@ function App() {
   const [chunkSettings, setChunkSettings] = useState<ChunkingSettings>({ chunkSize: 150, overlap: 30 });
   const [chunks, setChunks] = useState<Chunk[]>([]);
   const [topK, setTopK] = useState(4);
-  const [selectedModel, setSelectedModel] = useState<LlmModel>(AVAILABLE_MODELS[0]);
+  const [selectedModel, setSelectedModel] = useState<LlmModel>(AVAILABLE_MODELS[0]); // Default to Gemini 2.5 Flash
   const [llmEnabled, setLlmEnabled] = useState(true);
   const [status, setStatus] = useState<RagStatus>(RagStatus.IDLE);
   const [currentResult, setCurrentResult] = useState<RagResult>({
@@ -179,9 +179,10 @@ function App() {
 
         if (llmEnabled) {
             // Run in parallel
+            // Pass the selected model ID. If it's a "simulated" model (non-Gemini), the service will fallback to default.
             const [preRes, ragRes] = await Promise.all([
-                generateResponse(preRagPrompt),
-                generateResponse(ragPrompt)
+                generateResponse(preRagPrompt, selectedModel.id),
+                generateResponse(ragPrompt, selectedModel.id)
             ]);
             preAns = preRes;
             ragAns = ragRes;
@@ -198,6 +199,8 @@ function App() {
         let analysisText = "";
         const isRagUnknown = ragAns.toLowerCase().includes("i do not know");
         const isPreRagLong = preAns.length > 50;
+        
+        const modelNote = selectedModel.isSimulated ? `(Note: Using Gemini to simulate ${selectedModel.name})` : `(Using ${selectedModel.name})`;
 
         if (isRagUnknown && isPreRagLong) {
             analysisText = "Notice: The RAG model couldn't find the answer in the provided manual excerpts, so it correctly backed off ('I do not know'). The Pre-RAG model answered from its general training data, which might be correct but is technically a 'hallucination' relative to the provided source.";
@@ -210,7 +213,7 @@ function App() {
         const responseMsg: Message = {
             id: (Date.now() + 1).toString(),
             role: 'assistant',
-            content: `Pipeline complete.\n\n${analysisText}\n\n• Retrieved ${topK} chunks\n• Highest similarity: ${retrieved[0]?.similarity?.toFixed(2)}`,
+            content: `Pipeline complete ${modelNote}.\n\n${analysisText}\n\n• Retrieved ${topK} chunks\n• Highest similarity: ${retrieved[0]?.similarity?.toFixed(2)}`,
             timestamp: Date.now()
         };
         setMessages(prev => [...prev, responseMsg]);

@@ -1,3 +1,4 @@
+
 import { GoogleGenAI } from "@google/genai";
 
 const apiKey = process.env.API_KEY || '';
@@ -5,7 +6,7 @@ const apiKey = process.env.API_KEY || '';
 const ai = apiKey ? new GoogleGenAI({ apiKey }) : null;
 
 export const EMBEDDING_MODEL = "text-embedding-004";
-export const CHAT_MODEL = "gemini-2.5-flash";
+export const DEFAULT_CHAT_MODEL = "gemini-2.5-flash";
 
 /**
  * Generate embeddings for a list of texts.
@@ -42,14 +43,17 @@ export const getEmbeddings = async (texts: string[]): Promise<number[][]> => {
 /**
  * Generate a single text response.
  */
-export const generateResponse = async (prompt: string): Promise<string> => {
+export const generateResponse = async (prompt: string, modelId: string = DEFAULT_CHAT_MODEL): Promise<string> => {
   if (!ai) {
      return "API Key missing. Cannot generate response.";
   }
 
+  // Fallback to default if a simulated model ID is passed
+  const activeModel = modelId.startsWith('gemini') ? modelId : DEFAULT_CHAT_MODEL;
+
   try {
     const response = await ai.models.generateContent({
-      model: CHAT_MODEL,
+      model: activeModel,
       contents: prompt,
     });
     return response.text || "No response generated.";
@@ -71,7 +75,7 @@ export const countTokens = async (text: string): Promise<number> => {
 
     try {
         const response = await ai.models.countTokens({
-            model: CHAT_MODEL,
+            model: DEFAULT_CHAT_MODEL,
             contents: text,
         });
         return response.totalTokens || Math.ceil(text.length / 4);
