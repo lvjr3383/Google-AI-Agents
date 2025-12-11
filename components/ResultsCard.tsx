@@ -1,20 +1,18 @@
 
 import React, { useState } from 'react';
-import { RagResult, LlmModel, AVAILABLE_MODELS } from '../types';
-import { Bot, Zap, FileText, AlertTriangle, Scale, CircleHelp, ChevronDown } from 'lucide-react';
+import { RagResult } from '../types';
+import { Bot, Zap, FileText, AlertTriangle, Scale, CircleHelp } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, ReferenceLine, Legend } from 'recharts';
 
 interface Props {
   result: RagResult;
   topK: number;
   onTopKChange: (k: number) => void;
-  selectedModel: LlmModel;
-  onModelChange: (model: LlmModel) => void;
   llmEnabled: boolean;
   onLlmToggle: () => void;
 }
 
-const ResultsCard: React.FC<Props> = ({ result, topK, onTopKChange, selectedModel, onModelChange, llmEnabled, onLlmToggle }) => {
+const ResultsCard: React.FC<Props> = ({ result, topK, onTopKChange, llmEnabled, onLlmToggle }) => {
   const [showPrompt, setShowPrompt] = useState<'none' | 'pre' | 'rag'>('none');
 
   const ragTokens = result.tokenCounts?.rag || 0;
@@ -39,6 +37,9 @@ const ResultsCard: React.FC<Props> = ({ result, topK, onTopKChange, selectedMode
     }
   ];
 
+  // Default limit for Gemini 2.5 Flash
+  const DEFAULT_LIMIT = 1000000;
+
   return (
     <div className="bg-white rounded-lg border border-slate-200 shadow-sm flex flex-col h-full">
       <div className="p-4 border-b border-slate-200 bg-slate-50 flex justify-between items-center flex-wrap gap-2">
@@ -48,26 +49,6 @@ const ResultsCard: React.FC<Props> = ({ result, topK, onTopKChange, selectedMode
         </div>
         
         <div className="flex items-center gap-4">
-             {/* Model Dropdown */}
-            <div className="relative group">
-                <label className="text-[10px] text-slate-500 font-bold block mb-0.5">Simulated Model</label>
-                <div className="relative">
-                    <select 
-                        value={selectedModel.id}
-                        onChange={(e) => {
-                            const model = AVAILABLE_MODELS.find(m => m.id === e.target.value);
-                            if (model) onModelChange(model);
-                        }}
-                        className="appearance-none bg-white border border-slate-300 hover:border-indigo-500 rounded px-2 py-1 pr-8 text-xs text-slate-700 font-medium focus:outline-none focus:ring-1 focus:ring-indigo-500 w-36 cursor-pointer"
-                    >
-                        {AVAILABLE_MODELS.map(m => (
-                            <option key={m.id} value={m.id}>{m.name}</option>
-                        ))}
-                    </select>
-                    <ChevronDown className="w-3 h-3 text-slate-500 absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none" />
-                </div>
-            </div>
-
             {/* Top-K Selector */}
             <div className="flex flex-col items-center">
                 <div className="flex items-center gap-1 mb-0.5 relative group/tooltip">
@@ -220,10 +201,7 @@ const ResultsCard: React.FC<Props> = ({ result, topK, onTopKChange, selectedMode
              <div className="flex items-center gap-2 mb-2 justify-between">
                 <div className="flex items-center gap-2">
                     <Scale className="w-4 h-4 text-slate-500" />
-                    <h4 className="text-xs font-semibold text-slate-700">Prompt Token Usage vs. Simulated Context Limit</h4>
-                </div>
-                <div className="text-[10px] text-indigo-600 font-medium bg-indigo-50 px-2 py-0.5 rounded border border-indigo-100">
-                    Active Limit: {selectedModel.contextLimit.toLocaleString()} tokens
+                    <h4 className="text-xs font-semibold text-slate-700">Token Usage Analysis</h4>
                 </div>
              </div>
              
@@ -238,7 +216,6 @@ const ResultsCard: React.FC<Props> = ({ result, topK, onTopKChange, selectedMode
                         <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" horizontal={false} />
                         <XAxis 
                             type="number" 
-                            domain={[0, selectedModel.contextLimit]} 
                             tick={{ fill: '#64748b', fontSize: 10 }}
                             tickFormatter={(val) => val >= 1000 ? `${val/1000}k` : val}
                             stroke="#cbd5e1"
@@ -259,12 +236,6 @@ const ResultsCard: React.FC<Props> = ({ result, topK, onTopKChange, selectedMode
                             }}
                         />
                         <Legend wrapperStyle={{ fontSize: '11px', paddingTop: '10px', color: '#475569' }} />
-                        <ReferenceLine 
-                            x={selectedModel.contextLimit} 
-                            stroke="#ef4444" 
-                            strokeDasharray="3 3" 
-                            label={{ position: 'insideTopRight', value: 'Context Limit', fill: '#ef4444', fontSize: 10 }} 
-                        />
                         
                         <Bar dataKey="Context" stackId="a" fill="#6366f1" name="Retrieved Context" radius={[0, 0, 0, 0]} />
                         <Bar dataKey="Overhead" stackId="a" fill="#f59e0b" name="Instruction & Overhead" radius={[0, 4, 4, 0]} />
@@ -272,9 +243,6 @@ const ResultsCard: React.FC<Props> = ({ result, topK, onTopKChange, selectedMode
                     </BarChart>
                  </ResponsiveContainer>
              </div>
-             <p className="text-[9px] text-slate-400 mt-1 text-right italic">
-                Simulating {selectedModel.name} token limits.
-             </p>
         </div>
       </div>
     </div>

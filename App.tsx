@@ -5,7 +5,7 @@ import Workspace from './components/Workspace';
 import { TESLA_CORPUS } from './services/data';
 import { chunkText, cosineSimilarity } from './services/ragUtils';
 import { getEmbeddings, generateResponse, countTokens } from './services/geminiService';
-import { Chunk, ChunkingSettings, Message, RagResult, RagStatus, AVAILABLE_MODELS, LlmModel } from './types';
+import { Chunk, ChunkingSettings, Message, RagResult, RagStatus } from './types';
 
 function App() {
   // --- STATE ---
@@ -21,7 +21,6 @@ function App() {
   const [chunkSettings, setChunkSettings] = useState<ChunkingSettings>({ chunkSize: 150, overlap: 30 });
   const [chunks, setChunks] = useState<Chunk[]>([]);
   const [topK, setTopK] = useState(4);
-  const [selectedModel, setSelectedModel] = useState<LlmModel>(AVAILABLE_MODELS[0]); // Default to Gemini 2.5 Flash
   const [llmEnabled, setLlmEnabled] = useState(true);
   const [status, setStatus] = useState<RagStatus>(RagStatus.IDLE);
   const [currentResult, setCurrentResult] = useState<RagResult>({
@@ -144,7 +143,7 @@ function App() {
         
         const contextText = retrieved.map((c, i) => `[Chunk ${i+1}] (Score: ${c.similarity?.toFixed(2)})\n${c.text}`).join('\n\n');
         
-        // Updated Prompt: More explicit about strict grounding vs "I don't know"
+        // Robust Prompt
         const ragPrompt = `You are a helpful assistant for a Tesla Model X owner. Answer the question based ONLY on the provided context chunks. Do not use outside knowledge. \n\nContext:\n${contextText}\n\nQuestion: ${question}\n\nIf the answer is not supported by the context, state "I do not know based on the provided documents."`;
 
         // Calculate Tokens
@@ -179,10 +178,9 @@ function App() {
 
         if (llmEnabled) {
             // Run in parallel
-            // Pass the selected model ID. If it's a "simulated" model (non-Gemini), the service will fallback to default.
             const [preRes, ragRes] = await Promise.all([
-                generateResponse(preRagPrompt, selectedModel.id),
-                generateResponse(ragPrompt, selectedModel.id)
+                generateResponse(preRagPrompt),
+                generateResponse(ragPrompt)
             ]);
             preAns = preRes;
             ragAns = ragRes;
@@ -200,8 +198,6 @@ function App() {
         const isRagUnknown = ragAns.toLowerCase().includes("i do not know");
         const isPreRagLong = preAns.length > 50;
         
-        const modelNote = selectedModel.isSimulated ? `(Note: Using Gemini to simulate ${selectedModel.name})` : `(Using ${selectedModel.name})`;
-
         if (isRagUnknown && isPreRagLong) {
             analysisText = "Notice: The RAG model couldn't find the answer in the provided manual excerpts, so it correctly backed off ('I do not know'). The Pre-RAG model answered from its general training data, which might be correct but is technically a 'hallucination' relative to the provided source.";
         } else if (isRagUnknown) {
@@ -213,7 +209,7 @@ function App() {
         const responseMsg: Message = {
             id: (Date.now() + 1).toString(),
             role: 'assistant',
-            content: `Pipeline complete ${modelNote}.\n\n${analysisText}\n\n• Retrieved ${topK} chunks\n• Highest similarity: ${retrieved[0]?.similarity?.toFixed(2)}`,
+            content: `Pipeline complete.\n\n${analysisText}\n\n• Retrieved ${topK} chunks\n• Highest similarity: ${retrieved[0]?.similarity?.toFixed(2)}`,
             timestamp: Date.now()
         };
         setMessages(prev => [...prev, responseMsg]);
@@ -250,8 +246,6 @@ function App() {
             questionEmbedding={queryEmbedding}
             topK={topK}
             onTopKChange={setTopK}
-            selectedModel={selectedModel}
-            onModelChange={setSelectedModel}
             llmEnabled={llmEnabled}
             onLlmToggle={() => setLlmEnabled(!llmEnabled)}
             isProcessing={status !== RagStatus.IDLE}

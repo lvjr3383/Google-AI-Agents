@@ -1,20 +1,39 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
+# Tesla RAG Visualizer
 
-# Run and deploy your AI Studio app
+An interactive educational tool demonstrating Retrieval-Augmented Generation (RAG) concepts using a Tesla Model X manual corpus. 
 
-This contains everything you need to run your app locally.
-
-View your app in AI Studio: https://ai.studio/apps/drive/121q5MYLQ7wuSmb0-DxfiUh8E3vaRM_G3
+This tool visualizes the RAG pipeline steps:
+1. **Chunking Strategy**: See how text is split into overlapping segments.
+2. **Vector Space**: Visualize text embeddings and query similarity in a 2D plot.
+3. **Generation**: Compare "Pre-RAG" (hallucination-prone) answers vs. "RAG" (grounded) answers.
 
 ## Run Locally
 
-**Prerequisites:**  Node.js
+### Prerequisites
+- Node.js installed on your machine.
+- A Google Gemini API Key.
 
+### Steps
 
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+1. **Clone the repository** and install dependencies:
+   ```bash
+   npm install
+   ```
+
+2. **Configure your API Key**:
+   - Get a free API key from [Google AI Studio](https://aistudio.google.com/).
+   - Create a file named `.env` in the root directory of the project.
+   - Add your key to the file (variable name must be `API_KEY`):
+     ```env
+     API_KEY=your_actual_api_key_string
+     ```
+
+3. **Start the application**:
+   ```bash
+   npm run dev
+   ```
+
+4. Open your browser to the URL provided in the terminal (usually `http://localhost:1234` or similar).
+
+---
+*Built with React, TailwindCSS, and the Google Gemini API.*

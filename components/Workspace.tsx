@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Chunk, ChunkingSettings, RagResult, LlmModel } from '../types';
+import { Chunk, ChunkingSettings, RagResult } from '../types';
 import ChunkingCard from './ChunkingCard';
 import EmbeddingCard from './EmbeddingCard';
 import ResultsCard from './ResultsCard';
@@ -15,8 +15,6 @@ interface Props {
   questionEmbedding?: number[];
   topK: number;
   onTopKChange: (k: number) => void;
-  selectedModel: LlmModel;
-  onModelChange: (model: LlmModel) => void;
   llmEnabled: boolean;
   onLlmToggle: () => void;
   isProcessing: boolean;
@@ -32,8 +30,6 @@ const Workspace: React.FC<Props> = ({
   questionEmbedding,
   topK,
   onTopKChange,
-  selectedModel,
-  onModelChange,
   llmEnabled,
   onLlmToggle,
   isProcessing
@@ -69,8 +65,6 @@ const Workspace: React.FC<Props> = ({
             result={result}
             topK={topK}
             onTopKChange={onTopKChange}
-            selectedModel={selectedModel}
-            onModelChange={onModelChange}
             llmEnabled={llmEnabled}
             onLlmToggle={onLlmToggle}
         />

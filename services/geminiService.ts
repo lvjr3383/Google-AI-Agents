@@ -43,17 +43,14 @@ export const getEmbeddings = async (texts: string[]): Promise<number[][]> => {
 /**
  * Generate a single text response.
  */
-export const generateResponse = async (prompt: string, modelId: string = DEFAULT_CHAT_MODEL): Promise<string> => {
+export const generateResponse = async (prompt: string): Promise<string> => {
   if (!ai) {
      return "API Key missing. Cannot generate response.";
   }
 
-  // Fallback to default if a simulated model ID is passed
-  const activeModel = modelId.startsWith('gemini') ? modelId : DEFAULT_CHAT_MODEL;
-
   try {
     const response = await ai.models.generateContent({
-      model: activeModel,
+      model: DEFAULT_CHAT_MODEL,
       contents: prompt,
     });
     return response.text || "No response generated.";
