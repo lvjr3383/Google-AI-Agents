@@ -2,41 +2,41 @@
 
 > **"To understand the model, we must slow it down."**
 
-An educational walkthrough of sentiment analysis that shows every step of the reasoning pipeline—without exposing private prompts or any production-only tricks. It is designed as a teaching tool: clear visuals, explicit stages, and guardrails to keep keys and implementation details private.
+An end-to-end, explainable sentiment demo that turns a classifier into a glass box. It shows every stage—from tokenization to vector mapping to feature importance and the final signal—so learners can see how LLM-driven sentiment works. Prompts are kept minimal; you can override them via env vars if you want more flavor.
 
-## Why it exists
-- Turn the typical “black box” sentiment demo into a glass box for learners.
-- Show how raw text becomes tokens, vectors, feature importance, and finally a sentiment signal.
-- Encourage questions: the chat panel lets users interrogate each stage instead of just accepting a label.
+## Why we built it
+- Make sentiment analysis teachable instead of a black box.
+- Show that “meaning” is coordinates, weights, and thresholds, not magic.
+- Encourage curious users to ask “why” at each step via the chat sidecar.
 
-## What the user experiences
-- **Left panel (Chat + Controls):** enter text, ask questions, adjust the confidence threshold, and drive the step progression.
-- **Right panel (Visualization):** four stages:
-  1) **Tokenization:** see tokens, optional IDs, and any subword splits.
-  2) **Vector Space:** a scatter plot that positions the input against anchor concepts (X = sentiment, Y = intensity/abstraction).
-  3) **Explainability:** clickable heatmap words plus a sentiment arc over time.
-  4) **Final Signal:** classification, confidence meter vs. your threshold, and a short “field note” lesson.
+## What you see (UX flow)
+- **Left panel (Chat + Controls):** send text, ask questions, tweak the confidence threshold, drive the step progression.
+- **Right panel (Visualization):** four stages
+  1) **Tokenization:** tokens, optional IDs, subword splits.
+  2) **Vector Space:** scatter plot; X = sentiment (-10 to 10), Y = intensity/abstraction (-10 to 10); anchors + current point.
+  3) **Explainability:** clickable heatmap words + sentiment arc over time.
+  4) **Final Signal:** label, confidence meter vs. your threshold, plus a short “field note.”
 
-## How it works (high level)
-- **Two-model flow:** one Gemini model produces structured analysis JSON; a lighter model handles follow-up questions without re-running analysis.
-- **Strict data contract:** the analysis response is forced into a schema so the UI can render deterministically (tokens, vector coordinates, impact words, sentiment arc, final signal, lesson text).
-- **Frontend stack:** React + TypeScript + Vite, Tailwind via CDN for speed, Recharts for charts, Lucide for icons.
+## How it works (architecture)
+- **Two-model flow:** a reasoning model returns structured JSON; a fast model answers follow-up questions without re-running analysis.
+- **Strict schema:** the analysis response must include tokens, tokenIds, subwords, vector coordinates, high-impact words, sentiment arc, and lesson text so the UI can render deterministically.
+- **Stack:** React + TypeScript + Vite, Tailwind (CDN), Recharts, Lucide.
 
-## What is **not** included
-- No proprietary prompt text, private weights, or internal parameters are published here.
-- The schema comments explain shapes for rendering, not “secret sauce” logic.
-- Keys stay local; nothing sensitive is committed.
+## Lessons and design choices
+- Interpretability first: every chart corresponds to a field in the schema; no hidden logic.
+- Threshold as a teaching lever: users can tune “confidence” and see how it gates the final signal.
+- Minimal prompts in repo: enough to run; override via env to experiment with your own wording.
 
 ## Quickstart
 1) Install dependencies:
 ```bash
 npm install
 ```
-2) Provide your Gemini key in `.env.local` (kept out of git):
+2) Add your Gemini key in `.env.local` (kept out of git):
 ```bash
 GEMINI_API_KEY=your_gemini_key_here
 ```
-Optional: add your own prompts (leave blank to use the minimal defaults in code):
+Optional: override prompts (leave blank to use minimal defaults):
 ```bash
 ANALYSIS_PROMPT="Your analysis prompt"
 CHAT_PROMPT="Your chat prompt"
@@ -45,23 +45,19 @@ CHAT_PROMPT="Your chat prompt"
 ```bash
 npm run dev
 ```
-4) Open the UI, paste any text, and step through the stages (use the “Proceed to Next Step” button in the chat panel).
+4) Open the UI, paste text, and click “Proceed to Next Step” to advance the pipeline.
 
-## Project structure (high level)
+## Project structure
 - `App.tsx` — orchestrates the four-step state machine and layout.
-- `components/AnalysisResult.tsx` — renders token view, vector plot, heatmap, sentiment arc, final signal, and lesson.
+- `components/AnalysisResult.tsx` — token view, vector plot, heatmap, sentiment arc, final signal, lesson.
 - `components/ChatInterface.tsx` — chat UI, threshold slider, proceed/reset controls, suggested questions.
-- `services/geminiService.ts` — API calls and response schema enforcement (keys pulled from env; prompts can be overridden via env).
-- `types.ts` — shared enums and interfaces for the analysis data.
-- `.env.local` — placeholder for your key (not tracked); add your own `.env.local` or shell export.
+- `services/geminiService.ts` — API calls + schema enforcement (env-driven prompts allowed).
+- `types.ts` — enums and interfaces for the analysis data.
+- `.env.local` — your key and optional prompt overrides (not tracked).
 
-## Data and privacy notes
-- The analysis output uses illustrative coordinates and scores for education; do not present it as production-grade scoring.
-- Keep your `GEMINI_API_KEY` private. Do not commit environment files with real keys.
-- Logs/telemetry follow Google’s service terms; avoid sending sensitive text for analysis.
-- Default prompts are intentionally minimal. Supply your own via env if you want a more guided experience.
-
-## Known constraints
-- Charts are tuned for short to medium inputs; very long texts may truncate labels.
-- Tailwind is loaded via CDN for simplicity; there is no purge step.
-- The UI expects the schema fields shown above; changing them requires matching TypeScript updates.
+## Data, privacy, and limits
+- Outputs are illustrative for education; not production-grade scoring.
+- Keep `GEMINI_API_KEY` private; do not commit env files with real keys.
+- Avoid sending sensitive text; logs follow Google service terms.
+- Charts favor short/medium inputs; very long text can truncate labels.
+- Tailwind via CDN; no purge step. Changing schema requires matching TS updates.
