@@ -1,0 +1,5 @@
+{
+  "name": "Sentiment Extractor",
+  "description": "An interactive NLP field guide that reverse-engineers sentiment analysis using Gemini's thinking capabilities.",
+  "requestFramePermissions": []
+}
