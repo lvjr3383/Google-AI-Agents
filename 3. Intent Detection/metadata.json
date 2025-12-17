@@ -1,0 +1,5 @@
+{
+  "name": "The Intent Detection",
+  "description": "An interactive educational tool visualizing NLP text classification through a sequential 4-step wizard journey.",
+  "requestFramePermissions": []
+}
