@@ -23,10 +23,15 @@ This tool visualizes the RAG pipeline steps:
 
 2. **Configure your API Key** (still inside `1. RAG visualizer`):
    - Get a free API key from [Google AI Studio](https://aistudio.google.com/).
-   - Create a file named `.env` in the root directory of the project.
-   - Add your key to the file (variable name must be `API_KEY`):
+   - Create a file named `.env` in the root directory of the project (or copy `.env.example`):
+   - Add your key to the file:
      ```env
-     API_KEY=your_actual_api_key_string
+     GEMINI_API_KEY=your_actual_api_key_string
+     ```
+   - Optional: override prompt templates (default prompts are minimal):
+     ```env
+     PRE_RAG_PROMPT="Answer concisely. Question: {{question}}"
+     RAG_PROMPT="Use only the provided context to answer. If missing, say you do not know.\n\nContext:\n{{context}}\n\nQuestion: {{question}}"
      ```
 
 3. **Start the application**:

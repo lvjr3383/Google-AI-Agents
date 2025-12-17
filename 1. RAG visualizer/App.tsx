@@ -7,6 +7,13 @@ import { chunkText, cosineSimilarity } from './services/ragUtils';
 import { getEmbeddings, generateResponse, countTokens } from './services/geminiService';
 import { Chunk, ChunkingSettings, Message, RagResult, RagStatus } from './types';
 
+const PRE_RAG_TEMPLATE = (process.env.PRE_RAG_PROMPT || '').trim() || 'Answer the question concisely.\n\nQuestion: {{question}}';
+const RAG_TEMPLATE = (process.env.RAG_PROMPT || '').trim() || 'Use only the provided context to answer. If the context is insufficient, say you do not know.\n\nContext:\n{{context}}\n\nQuestion: {{question}}';
+
+const fillTemplate = (template: string, values: Record<string, string>) => {
+  return Object.entries(values).reduce((acc, [key, val]) => acc.replace(`{{${key}}}`, val), template);
+};
+
 function App() {
   // --- STATE ---
   const [messages, setMessages] = useState<Message[]>([
@@ -139,12 +146,12 @@ function App() {
         const retrieved = scoredChunks.slice(0, topK);
 
         // C. Construct Prompts
-        const preRagPrompt = `Answer the following question as clearly and concisely as you can.\n\nQuestion: ${question}`;
+        const preRagPrompt = fillTemplate(PRE_RAG_TEMPLATE, { question });
         
         const contextText = retrieved.map((c, i) => `[Chunk ${i+1}] (Score: ${c.similarity?.toFixed(2)})\n${c.text}`).join('\n\n');
         
-        // Robust Prompt
-        const ragPrompt = `You are a helpful assistant for a Tesla Model X owner. Answer the question based ONLY on the provided context chunks. Do not use outside knowledge. \n\nContext:\n${contextText}\n\nQuestion: ${question}\n\nIf the answer is not supported by the context, state "I do not know based on the provided documents."`;
+        // Context-bound prompt
+        const ragPrompt = fillTemplate(RAG_TEMPLATE, { question, context: contextText });
 
         // Calculate Tokens
         let preRagTokens = 0;

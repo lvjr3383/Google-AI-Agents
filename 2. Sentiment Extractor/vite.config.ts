@@ -12,7 +12,9 @@ export default defineConfig(({ mode }) => {
       plugins: [react()],
       define: {
         'process.env.API_KEY': JSON.stringify(env.GEMINI_API_KEY),
-        'process.env.GEMINI_API_KEY': JSON.stringify(env.GEMINI_API_KEY)
+        'process.env.GEMINI_API_KEY': JSON.stringify(env.GEMINI_API_KEY),
+        'process.env.ANALYSIS_PROMPT': JSON.stringify(env.ANALYSIS_PROMPT || ''),
+        'process.env.CHAT_PROMPT': JSON.stringify(env.CHAT_PROMPT || '')
       },
       resolve: {
         alias: {
