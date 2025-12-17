@@ -1,19 +1,7 @@
 import { GoogleGenAI, Type, Schema } from "@google/genai";
 import { SentimentAnalysis, SentimentLabel } from "../types";
 
-// Allow prompts to be provided via env so the repo does not publish the full recipe.
-const DEFAULT_ANALYSIS_PROMPT = `
-ROLE: Sentiment Extractor. Explain sentiment decisions clearly and concisely.
-TASK: Given user text, classify as Positive/Negative/Neutral with a confidence 0-1. Return JSON that matches the provided schema: tokens, tokenIds (ints), subwords, vectorSpaceDescription, 7 vectorCoordinates (one isCurrent=true), highImpactWords with impactScore and reason, nuanceExplanation, sentimentArc aligned to tokens, and a lesson (title/content). X axis = sentiment (-10 to 10), Y axis = intensity/abstraction (-10 to 10). Keep wording brief and factual.
-`;
-
-const DEFAULT_CHAT_PROMPT = `
-ROLE: Sentiment guide. Answer questions about tokenization, vector space, and sentiment at a high level. If context JSON is provided, reference it briefly. Keep answers under 80 words.
-`;
-
 const apiKey = process.env.API_KEY;
-const analysisPrompt = (process.env.ANALYSIS_PROMPT || "").trim() || DEFAULT_ANALYSIS_PROMPT.trim();
-const chatPrompt = (process.env.CHAT_PROMPT || "").trim() || DEFAULT_CHAT_PROMPT.trim();
 
 if (!apiKey) {
   console.error("API_KEY is not set in the environment variables.");
@@ -97,6 +85,34 @@ const analysisSchema: Schema = {
 export const analyzeSentiment = async (text: string): Promise<SentimentAnalysis> => {
   const model = "gemini-3-pro-preview"; // Using Pro for complex reasoning/thinking
 
+  const systemInstruction = `
+    ROLE: Sentiment Extractor (Chapter 6: Sentiment Extraction)
+    CONTEXT: You are the interactive companion for the "Practical NLP Field Guide." 
+    MISSION: Demystify "Sentiment Extraction". Reverse-engineer your own processing.
+    
+    TONE: Professional, insightful, rigorous but accessible. "Stanford CS translated for a startup CTO."
+    
+    TASK: Analyze the user's input.
+    1. THE SIGNAL: Classify Positive/Negative/Neutral. Provide a confidence score. Use a "Binning" metaphor.
+    2. THE MECHANICS: 
+       - Tokenize the text: split into tokens AND assign hypothetical integer IDs.
+       - Describe the Vector Space location.
+       - Generate visual coordinates for a 2D scatter plot (Range: -10 to 10). 
+       - Place the user's text (isCurrent=true) intelligently.
+       - Generate 6 'Anchor' points.
+       - MAPPING RULES for X/Y:
+           X-AXIS = SENTIMENT (-10 is pure negative, +10 is pure positive).
+           Y-AXIS = INTENSITY/ABSTRACTION (-10 is mundane/concrete, +10 is intense/abstract).
+    3. THE WHY: 
+       - Identify high impact words.
+       - **GENERATE SENTIMENT ARC**: Create a sequence of numbers (matching token count) that represents the emotional journey of the sentence. 
+         - Start near 0.
+         - Go up for positive words, down for negative.
+         - Handle negation (e.g., "not good" should go up for "good" then crash down for "not" or vice versa depending on your tokenization logic, or stay flat then drop).
+         - Example: "I loved it" -> [0, 5, 8]. "I hated it" -> [0, -5, -8].
+    4. THE LESSON: Connect to an engineering principle (e.g., handling sarcasm, negation, magnitude).
+  `;
+
   try {
     const response = await ai.models.generateContent({
       model: model,
@@ -107,7 +123,7 @@ export const analyzeSentiment = async (text: string): Promise<SentimentAnalysis>
         },
       ],
       config: {
-        systemInstruction: analysisPrompt,
+        systemInstruction: systemInstruction,
         responseMimeType: "application/json",
         responseSchema: analysisSchema,
         thinkingConfig: { thinkingBudget: 16000 }, 
@@ -130,6 +146,17 @@ export const analyzeSentiment = async (text: string): Promise<SentimentAnalysis>
 export const chatWithAgent = async (text: string, context?: SentimentAnalysis | null): Promise<string> => {
   const model = "gemini-2.5-flash"; // Faster model for chat
 
+  const systemInstruction = `
+    ROLE: Sentiment Extractor.
+    CONTEXT: You are a helpful NLP expert explaining concepts like Tokenization, Vector Spaces, and Sentiment Analysis.
+    TONE: Brief, educational, slightly technical but clear.
+    
+    If the user asks about the "last analysis", refer to the provided context JSON.
+    If the user asks general questions, answer them conceptually.
+    If the user is asking to proceed to the next step (e.g. "yes", "next"), acknowledge it briefly.
+    Keep answers under 80 words.
+  `;
+
   let prompt = text;
   if (context) {
     prompt = `Context (Last Analysis): ${JSON.stringify(context)}\n\nUser Question: ${text}`;
@@ -140,7 +167,7 @@ export const chatWithAgent = async (text: string, context?: SentimentAnalysis | 
       model: model,
       contents: [{ role: "user", parts: [{ text: prompt }] }],
       config: {
-        systemInstruction: chatPrompt,
+        systemInstruction: systemInstruction,
       },
     });
     return response.text || "I'm having trouble retrieving that information.";

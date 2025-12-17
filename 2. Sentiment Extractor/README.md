@@ -36,11 +36,6 @@ npm install
 ```bash
 GEMINI_API_KEY=your_gemini_key_here
 ```
-Optional: add your own prompts to keep the full recipe private:
-```bash
-ANALYSIS_PROMPT="Your detailed analysis prompt"
-CHAT_PROMPT="Your chat prompt"
-```
 3) Run the dev server:
 ```bash
 npm run dev
@@ -51,7 +46,7 @@ npm run dev
 - `App.tsx` — orchestrates the four-step state machine and layout.
 - `components/AnalysisResult.tsx` — renders token view, vector plot, heatmap, sentiment arc, final signal, and lesson.
 - `components/ChatInterface.tsx` — chat UI, threshold slider, proceed/reset controls, suggested questions.
-- `services/geminiService.ts` — API calls and response schema enforcement (keys pulled from env; prompts can be overridden via env vars).
+- `services/geminiService.ts` — API calls and response schema enforcement (keys pulled from env).
 - `types.ts` — shared enums and interfaces for the analysis data.
 - `.env.local` — placeholder for your key (not tracked); add your own `.env.local` or shell export.
 
@@ -59,7 +54,7 @@ npm run dev
 - The analysis output uses illustrative coordinates and scores for education; do not present it as production-grade scoring.
 - Keep your `GEMINI_API_KEY` private. Do not commit environment files with real keys.
 - Logs/telemetry follow Google’s service terms; avoid sending sensitive text for analysis.
-- Default prompts in code are intentionally minimal. For the full guided flavor, use env vars to supply your own prompts and keep them private.
+- The prompts live in code for clarity and education; the key remains private via env.
 
 ## Known constraints
 - Charts are tuned for short to medium inputs; very long texts may truncate labels.
