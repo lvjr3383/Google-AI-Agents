@@ -1,0 +1,41 @@
+export const TRICKY_PHRASES = [
+  { text: "Habari gani?", hint: "Swahili (Bantu/Niger-Congo)" },
+  { text: "வணக்கம்", hint: "Tamil (Dravidian script)" },
+  { text: "გამარჯობა", hint: "Georgian (Kartvelian family)" },
+  { text: "Merhaba", hint: "Turkish (Turkic family)" },
+  { text: "नमस्ते", hint: "Hindi (Indo-Aryan)" },
+  { text: "Salamat", hint: "Tagalog (Austronesian)" },
+  { text: "ሰላም", hint: "Amharic (Semitic/Ethiopic)" },
+  { text: "Hjärtat", hint: "Swedish (The 'ä' fingerprint)" },
+  { text: "Burro", hint: "Butter (ITA) vs Donkey (SPA)" },
+  { text: "Gift", hint: "Poison (GER) vs Present (ENG)" },
+  { text: "Kælan", hint: "Icelandic (North Germanic)" },
+  { text: "नमस्ते जी", hint: "Hindi with Honorific" },
+  { text: "Allinllachu", hint: "Quechua (Amerindian)" },
+  { text: "Pryvit", hint: "Ukrainian (Slavic)" },
+  { text: "Dumela", hint: "Setswana (Bantu)" }
+];
+
+export const LANGUAGE_FAMILIES = {
+  Romance: { x: 120, y: 150, color: '#3B82F6' },
+  Germanic: { x: 280, y: 80, color: '#10B981' },
+  Slavic: { x: 450, y: 120, color: '#8B5CF6' },
+  IndoAryan: { x: 550, y: 280, color: '#F43F5E' },
+  Austronesian: { x: 700, y: 420, color: '#EC4899' },
+  SinoTibetan: { x: 720, y: 220, color: '#F59E0B' },
+  Afroasiatic: { x: 220, y: 380, color: '#EF4444' },
+  NigerCongo: { x: 150, y: 450, color: '#84CC16' },
+  Turkic: { x: 380, y: 180, color: '#06B6D4' },
+  Uralic: { x: 500, y: 50, color: '#14B8A6' },
+  Kartvelian: { x: 420, y: 240, color: '#6366F1' },
+  Amerindian: { x: 50, y: 300, color: '#D946EF' },
+  Dravidian: { x: 620, y: 350, color: '#8B5CF6' },
+  Austroasiatic: { x: 750, y: 320, color: '#10B981' },
+  NiloSaharan: { x: 300, y: 460, color: '#F59E0B' },
+  KraDai: { x: 780, y: 280, color: '#22C55E' },
+  Japonic: { x: 820, y: 180, color: '#E11D48' },
+  Koreanic: { x: 800, y: 150, color: '#4F46E5' },
+  HmongMien: { x: 680, y: 300, color: '#059669' },
+  Quechuan: { x: 80, y: 380, color: '#9333EA' },
+  Other: { x: 400, y: 350, color: '#6B7280' }
+};

@@ -1,0 +1,5 @@
+{
+  "name": "The Language Detection Agent",
+  "description": "An interactive digital detective tool that visualizes the NLP classification pipeline, explaining how AI identifies languages using Gemini intelligence.",
+  "requestFramePermissions": []
+}
