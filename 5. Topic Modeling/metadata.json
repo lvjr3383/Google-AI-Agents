@@ -1,0 +1,8 @@
+{
+  "name": "Topic Modeling",
+  "description": "An interactive educational tool visualizing how Latent Dirichlet Allocation (LDA) discovers hidden patterns in text datasets using a Sci-Fi lab interface.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone"
+  ]
+}
