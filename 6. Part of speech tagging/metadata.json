@@ -1,0 +1,6 @@
+
+{
+  "name": "Agent POS",
+  "description": "An educational POS tagging assistant that breaks down English sentences step-by-step.",
+  "requestFramePermissions": []
+}
