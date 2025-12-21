@@ -1,0 +1,5 @@
+{
+  "name": "Agent NER",
+  "description": "An educational Named Entity Recognition (NER) visualizer that helps students understand how AI extracts structured data from raw text.",
+  "requestFramePermissions": []
+}
