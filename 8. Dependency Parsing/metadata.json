@@ -1,0 +1,8 @@
+{
+  "name": "Structure Sentinel",
+  "description": "An expert linguistic agent for deep dependency parsing, moving beyond keyword recognition to reveal grammatical logic through a 4-step pipeline.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone"
+  ]
+}
