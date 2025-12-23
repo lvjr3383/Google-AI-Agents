@@ -1,0 +1,7 @@
+{
+  "name": "Constituency Parsing",
+  "description": "An interactive workspace for exploring constituency parsing and syntactic ambiguity through a pyramid construction metaphor.",
+  "requestFramePermissions": [
+    "microphone"
+  ]
+}
