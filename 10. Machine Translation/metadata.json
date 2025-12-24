@@ -1,0 +1,5 @@
+{
+  "name": "Agent Translator",
+  "description": "An educational NMT visualization tool that explores the 'weaving' of meaning from English into Spanish, German, Italian, Chinese, and Telugu.",
+  "requestFramePermissions": []
+}
