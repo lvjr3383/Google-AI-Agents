@@ -15,20 +15,10 @@ const ai = new GoogleGenAI({ apiKey: apiKey || "" });
  */
 export const analyzeIntent = async (text: string): Promise<AnalysisResponse> => {
   const systemPrompt = `
-  You are an advanced NLP Intent Classification Engine. 
-  Your task is to analyze the user's input and break it down into four distinct stages of processing.
-  
-  The coordinate system for the 'landscape' is:
-  X-Axis: -10 (Purely Informational) to +10 (Purely Transactional).
-  Y-Axis: -10 (Low Urgency) to +10 (High Urgency).
-
-  Known Clusters:
-  1. Account Security (High Urgency, Transactional) approx (8, 8)
-  2. Payments (Low Urgency, Transactional) approx (5, -5)
-  3. General Support (Mid Urgency, Informational) approx (-8, -2)
-
-  Return a STRICT JSON object confirming to the schema.
-  `;
+  You are an intent classifier. Return strict JSON matching the schema.
+  Use landscape coords: X -10 informational to +10 transactional; Y -10 low urgency to +10 high urgency.
+  Known clusters: Account Security ~(8,8); Payments ~(5,-5); General Support ~(-8,-2).
+  Keep text brief; fill all required fields.`;
 
   const response = await ai.models.generateContent({
     model: "gemini-3-pro-preview",
@@ -110,9 +100,8 @@ export const chatWithContext = async (
   userMessage: string
 ): Promise<string> => {
   
-  let contextPrompt = `You are the "Navigator" of this Intent Detection Laboratory.
-  Current Phase: ${WizardStep[currentStep]}
-  `;
+  let contextPrompt = `You are a concise intent assistant.
+  Current Phase: ${WizardStep[currentStep]}`;
 
   if (analysisData) {
     contextPrompt += `
@@ -126,11 +115,7 @@ export const chatWithContext = async (
     contextPrompt += `Waiting for user to input text for analysis.`;
   }
 
-  contextPrompt += `
-  Keep responses concise, educational, and helpful. 
-  Act like a senior engineer explaining the internals of the system.
-  Do not lecture, just guide.
-  `;
+  contextPrompt += ` Keep responses brief and plain; guide the user without extra flair.`;
 
   const chat = ai.chats.create({
     model: "gemini-2.5-flash",

@@ -34,7 +34,7 @@ export const getAgentExplanation = async (stage: LabStage, customPrompt?: string
       model,
       contents: prompt,
       config: {
-        systemInstruction: "You are an elite AI Data Scientist. Provide ultra-short, direct, professional insights. Lead with the core conclusion. NEVER use labels like 'Fact:' or 'Result:'. Use professional terms like 'vector space', 'clustering', and 'semantic indicators'. Max 25 words. No markdown or bold text.",
+        systemInstruction: "Provide ultra-short, direct insights (max 25 words), no markdown, no greetings. Stay factual and concise.",
         temperature: 0.3,
       }
     });

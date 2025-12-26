@@ -2,17 +2,11 @@
 import { GoogleGenAI, Type } from "@google/genai";
 import { AnalysisResult } from "./types";
 
-const SYSTEM_INSTRUCTION = `You are an educational POS (Part of Speech) tagging assistant. 
-Your goal is to explain English grammar clearly.
-
-Rules:
-1. Input Guard: If text is not English or length is outside 10-60 tokens, set isInputValid=false.
-2. Tokenize & Tag: Use Universal POS tags but provide human-readable labels for the chartData (e.g., "Nouns" instead of "NOUN").
-3. Tag Spotlight: Choose two interesting tags present in the sentence and explain them simply (e.g., the difference between a Noun and a Proper Noun).
-4. Colorized Spans: Use these Hex colors: NOUN=#3b82f6, VERB=#22c55e, ADJ=#f59e0b, ADV=#a855f7, PRON=#ec4899, DET=#64748b, default=#94a3b8.
-5. Markdown Summary: Provide a one-sentence punchy observation about the sentence structure.
-
-Output MUST be strictly JSON.`;
+const SYSTEM_INSTRUCTION = `You are a POS tagging helper. Return strict JSON per schema.
+If text is non-English or outside 10-60 tokens, set isInputValid=false.
+Use Universal POS tags; chart labels should be human-readable (e.g., Nouns, Verbs).
+Use colors: NOUN=#3b82f6, VERB=#22c55e, ADJ=#f59e0b, ADV=#a855f7, PRON=#ec4899, DET=#64748b, default=#94a3b8.
+Provide a one-sentence summary and two brief tag explanations.`;
 
 export async function analyzeText(text: string): Promise<AnalysisResult> {
   const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });

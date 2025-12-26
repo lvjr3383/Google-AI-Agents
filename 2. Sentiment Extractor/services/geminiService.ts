@@ -5,21 +5,15 @@ const apiKey = process.env.API_KEY;
 const analysisPrompt =
   (process.env.ANALYSIS_PROMPT || "").trim() ||
   `
-  ROLE: Sentiment analysis assistant.
-  TASK: Classify the input as Positive, Negative, or Neutral with a confidence (0-1).
-  OUTPUT: Strict JSON matching the provided schema (signal, mechanics, why, lesson).
-  Include tokens, tokenIds, subwords, vectorSpaceDescription, 7 vectorCoordinates (one isCurrent=true), highImpactWords with impactScore/reason, nuanceExplanation, sentimentArc (length = tokens), and a short lesson.
-  Axes: X = sentiment (-10 to 10), Y = intensity/abstraction (-10 to 10).
-  Keep wording concise and factual.
-  `;
+  You are a sentiment classifier. Return strict JSON matching the given schema.
+  Label as Positive, Negative, or Neutral with confidence 0-1.
+  Populate all fields: tokens, tokenIds, subwords, vector description, 7 vectorCoordinates (one isCurrent=true), highImpactWords, nuanceExplanation, sentimentArc, and a short lesson.
+  Keep text brief and factual.`;
 
 const chatPrompt =
   (process.env.CHAT_PROMPT || "").trim() ||
   `
-  ROLE: Sentiment guide.
-  TASK: Briefly answer user questions about sentiment analysis or the last analysis context.
-  STYLE: Under 80 words, educational, concise.
-  `;
+  Be concise (<=80 words). Answer user questions about sentiment or the last analysis context in plain language.`;
 
 if (!apiKey) {
   console.error("API_KEY is not set in the environment variables.");

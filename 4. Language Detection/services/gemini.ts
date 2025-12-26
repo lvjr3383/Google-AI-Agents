@@ -4,11 +4,11 @@ import { DetectionResult, PipelineStep } from "../types";
 const apiKey = process.env.API_KEY || process.env.GEMINI_API_KEY;
 const detectPrompt =
   (process.env.DETECT_PROMPT || "").trim() ||
-  `Detect the language of the input, classify if it's gibberish, and return JSON that matches the schema provided. Include language name, confidence (0-1), linguistic family, two confusable candidates with scores, a list of distinctive clues (characters/letter patterns), and an action packet (isoCode, text direction, formattingRule, flag, actionDescription). Keep explanations concise.`;
+  `Detect language, flag gibberish, and return JSON matching the schema. Fill: language, confidence (0-1), family, two confusable candidates with scores, clues (characters/patterns), actionPacket (isoCode, direction, formattingRule, flag, actionDescription), summary, isGibberish. Keep it concise.`;
 
 const chatPrompt =
   (process.env.DETECT_CHAT_PROMPT || "").trim() ||
-  `You are a language detection guide. Answer briefly about the current pipeline step, referencing clues, families, probabilities, and the action packet without revealing the final answer too early. Keep responses under 4 sentences.`;
+  `Be brief. Explain the current detection step, reference clues/families/probabilities/action packet as needed. Keep under 4 sentences.`;
 
 const ai = new GoogleGenAI({ apiKey: apiKey || "" });
 
@@ -76,16 +76,16 @@ export const getDetectiveLogResponse = async (
   
   const stepMap = {
     [PipelineStep.INPUT]: "Initial evidence collection",
-    [PipelineStep.CLUE_HUNT]: "Scanning for character and pattern clues (fingerprints)",
-    [PipelineStep.NEIGHBORHOOD]: "Determining linguistic family and global positioning on the map",
-    [PipelineStep.TIE_BREAKER]: "Calculating probability and racing between top suspects",
-    [PipelineStep.PASSPORT]: "Final identification and system integration (The Big Reveal)"
+    [PipelineStep.CLUE_HUNT]: "Character/pattern clues",
+    [PipelineStep.NEIGHBORHOOD]: "Family estimation",
+    [PipelineStep.TIE_BREAKER]: "Probability tie-breaker",
+    [PipelineStep.PASSPORT]: "Final identification"
   };
 
   const systemInstruction = `${chatPrompt}
 Current step: ${stepMap[currentStep]}.
 Underlying detection (if known): ${currentDetection?.language || 'unknown'}.
-Tone: ${eli5 ? 'Simple, friendly' : 'Concise, professional'}.`;
+Tone: ${eli5 ? 'Simple' : 'Concise'}.`;
 
   const response = await ai.models.generateContent({
     model,

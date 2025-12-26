@@ -77,18 +77,9 @@ const PARSE_SCHEMA = {
 export async function parseSentence(sentence: string): Promise<ParsingResult> {
   const model = ai.models.generateContent({
     model: "gemini-3-pro-preview",
-    contents: `Analyze the following input using dependency parsing principles: "${sentence}".
-    
-    CRITICAL: First, determine if the input is a valid, grammatically sound English sentence. 
-    If it is a random jumble of words, incomplete fragment that lacks any logical structure, or highly ambiguous nonsense, set isValid to false and provide a validationMessage. When isValid is false, still return empty placeholders for anchor/linkage/hierarchy/revelation/suggestedQuestions so the UI does not break.
-    
-    If valid, execute the 4-step pipeline:
-    1. THE ANCHOR: Identify the ROOT verb and its POS.
-    2. THE LINKAGE: List key grammatical connections (nsubj, dobj, amod, etc).
-    3. THE HIERARCHY: Create an ASCII tree representing depth.
-    4. THE REVELATION: Extract the core logic as [Actor] -> [Action] -> [Recipient].
-    
-    Provide 3 curated educational questions.`,
+    contents: `Dependency-parse: "${sentence}"
+First, if not a parsable English sentence, set isValid=false, add validationMessage, and return empty placeholders so UI stays stable.
+If valid, fill schema with: root verb (anchor), key connections (linkage), ASCII tree (hierarchy), core tuple [Actor]->[Action]->[Recipient] (revelation), and 3 short suggestedQuestions.`,
     config: {
       thinkingConfig: { thinkingBudget: 32768 },
       responseMimeType: "application/json",
@@ -124,7 +115,7 @@ export async function askQuestion(sentence: string, question: string, history: {
       { text: `Question: ${question}` }
     ],
     config: {
-      systemInstruction: "You are Structure Sentinel, an expert linguist. Answer the user's question about dependency parsing with extreme conciseness (maximum 1-2 sentences). Maintain an educational but clinical tone. IMPORTANT: Strictly avoid all markdown symbols like asterisks for bold or italics. Use plain text only. No bullet points."
+      systemInstruction: "Answer dependency questions in 1-2 sentences, plain text, no markdown, concise and neutral."
     }
   });
 

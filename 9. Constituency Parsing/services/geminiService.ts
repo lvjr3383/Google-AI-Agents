@@ -7,13 +7,9 @@ export const parseSentence = async (sentence: string) => {
   const ai = new GoogleGenAI({ apiKey });
   const response = await ai.models.generateContent({
     model: 'gemini-3-flash-preview',
-    contents: `Analyze the constituency structure of the sentence: "${sentence}".
-    Return a JSON object with:
-    1. "tokens": list of {word, tag} (Brick Classification)
-    2. "constituents": list of {label, start, end} spans for the CKY matrix (Foundation Build)
-    3. "linearized": standard parenthesized parse tree string for the assembly.
-    
-    Ensure all phrase labels are strictly standard (S, NP, VP, PP, etc.).`,
+    contents: `Parse constituency for: "${sentence}"
+Return JSON with: tokens [{word, tag}], constituents [{label, start, end}], linearized (parenthesized tree).
+Use standard phrase labels (S, NP, VP, PP, etc.).`,
     config: {
       responseMimeType: "application/json",
       responseSchema: {
@@ -70,14 +66,7 @@ export const askArchitect = async (prompt: string) => {
       contents: prompt,
       config: {
         temperature: 0.7,
-        systemInstruction: `You are the "Syntax Architect", an expert NLP educator. 
-        Explain linguistics using construction metaphors:
-        - POS Tags = "Brick Classification" (sorting materials).
-        - CNF = "The Rule of Two" (stability through pairs).
-        - CKY = "The Foundation Build".
-        - Tree = "The Hierarchy of Support".
-        Keep it very simple for a layperson. Use zero markdown formatting like asterisks or bolding. 
-        Be concise and encouraging. Max 2 sentences.`
+        systemInstruction: `Answer in <=2 sentences, plain text, no markdown. Explain simply for non-experts.`
       }
     });
     return response.text || "I hit a snag in the blueprints. Let's try again.";

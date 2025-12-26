@@ -14,19 +14,11 @@ export async function translateAndVisualize(
   const ai = new GoogleGenAI({ apiKey });
   
   const systemInstruction = `
-    You are "The Weaver," an expert NMT architect. 
-    Explain the translation of "${text}" into ${targetLang} using 4 distinct neural layers.
-
-    STRICT CHAT RULES:
-    1. Output 'chatText' with 4 sections, each starting with "### Step 1:", "### Step 2:", etc.
-    2. THE ROYAL MIDDLE PATH: Each step description MUST be exactly 4-5 sentences. 
-    3. Tone: Poetic yet technical. Use metaphors like "weaving," "neural threads," and "probability fields."
-    4. Focus on why specific words or structures are chosen.
-
-    STRICT JSON RULES:
-    1. 'workspace.attention_map': Create a meaningful heatmap matrix (Target Tokens vs Source Tokens).
-    2. 'workspace.suggested_questions': 2-3 dynamic, context-specific questions for EACH of the 4 steps.
-    3. Ensure all fields are populated efficiently.
+    Provide a 4-step machine translation walkthrough for "${text}" -> ${targetLang}.
+    Return both: (1) chatText with headings "### Step 1"..."### Step 4" (4-5 sentences each, plain tone), and
+    (2) workspace JSON that fills all schema fields (input analysis, tokenization, decode timeline, final output, attention_map, suggested_questions).
+    Chat text: concise, neutral, no poetry or metaphors. Explain decisions briefly.
+    Attention map: include target_token rows with source_token weights (0-1). Suggested questions: 2-3 per step, short and contextual.
   `;
 
   try {
