@@ -1,0 +1,5 @@
+{
+  "name": "Agent QnA",
+  "description": "An educational AI agent that demystifies Question Answering systems by visualizing every step of the logical pipeline in a unique split-screen interface.",
+  "requestFramePermissions": []
+}
