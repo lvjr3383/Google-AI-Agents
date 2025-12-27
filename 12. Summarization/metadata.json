@@ -1,0 +1,5 @@
+{
+  "name": "Agent Summarizer",
+  "description": "An educational AI agent that demonstrates the anatomy of text compression through a visual, step-by-step pipeline.",
+  "requestFramePermissions": []
+}
