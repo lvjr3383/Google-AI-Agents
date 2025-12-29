@@ -1,0 +1,7 @@
+{
+  "name": "Agent Texty - The Travel Weaver",
+  "description": "An educational AI experience that demonstrates how LLMs generate text through retrieval, planning, and style transfer, themed around planning a kid-friendly trip from Nashville.",
+  "requestFramePermissions": [
+    "geolocation"
+  ]
+}
